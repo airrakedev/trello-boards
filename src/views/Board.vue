@@ -1,5 +1,5 @@
 <template>
-	<div class="box-border">
+	<div class="boards">
 		<div
 			class="extra-width h-screen px-6 bg-teal-500 overflow-x-auto mx-auto py-6 flex justify-start gap-6"
 		>
@@ -37,20 +37,7 @@
 											value="Add card"
 										/>
 										<button class="form-cancel-btn">
-											<svg
-												xmlns="http://www.w3.org/2000/svg"
-												fill="none"
-												viewBox="0 0 24 24"
-												stroke-width="1.5"
-												stroke="currentColor"
-												class="w-6 h-6"
-											>
-												<path
-													stroke-linecap="round"
-													stroke-linejoin="round"
-													d="M6 18L18 6M6 6l12 12"
-												/>
-											</svg>
+											<close-icon></close-icon>
 										</button>
 									</div>
 								</form>
@@ -59,27 +46,15 @@
 					</div>
 				</div>
 			</template>
-			<!-- <div class="list col-width">
-				<div class="main-card">
-					<div class="list-header">List Header</div>
-				</div>
-			</div>
-			<div class="list col-width">
-				<div class="main-card">
-					<div class="list-header">List Header</div>
-				</div>
-			</div>
-			<div class="list col-width">
-				<div class="main-card">
-					<div class="list-header">List Header</div>
-				</div>
-			</div> -->
+			<add-board></add-board>
 		</div>
 	</div>
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
 import { randomId } from "./../helpers/various";
+import CloseIcon from "@/assets/svg/close.vue";
+import AddBoard from "@/components/AddBoard.vue";
 
 const columns = ref([
 	{
@@ -149,3 +124,51 @@ const columns = ref([
 	},
 ]);
 </script>
+<style scoped lang="scss">
+.boards {
+	.list {
+		.main-card {
+			@apply rounded-lg text-gray-700 bg-gray-50 text-sm;
+			.list-header {
+				@apply py-2.5 px-2 relative font-semibold;
+			}
+			.list-card-body {
+				@apply mx-1 px-1;
+				.list-cards {
+					@apply rounded-md mb-2 relative bg-white shadow py-2 px-2.5;
+				}
+				.list-cards:last-child {
+					@apply mb-0;
+				}
+			}
+			.list-card-footer {
+				@apply w-full p-1.5;
+				button.add-card {
+					@apply p-1.5 rounded-lg hover:bg-gray-300 w-full text-left;
+					span.icon-add {
+						@apply mr-1.5 text-xl pl-1;
+					}
+				}
+				.add-card-form {
+					@apply px-0.5;
+					.input-wrapper {
+						@apply shadow rounded-md bg-white px-2 pt-2 pb-0.5;
+						textarea {
+							@apply outline-none w-full;
+						}
+					}
+					.form-btn {
+						@apply mt-2;
+						.form-add-btn {
+							@apply rounded cursor-pointer px-3 py-1.5 bg-blue-600 text-white mr-1 hover:bg-blue-700;
+						}
+						.form-cancel-btn {
+							@apply px-1 py-1.5;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+</style>
