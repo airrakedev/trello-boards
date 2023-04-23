@@ -17,17 +17,25 @@
 							</template>
 						</div>
 						<div class="list-card-footer">
-							<button class="add-card">
-								<span class="icon-add">+</span>
+							<button
+								v-if="!column.isAddActive"
+								class="add-card"
+								@click.prevent="toggleCardForm(index)"
+							>
+								<span class="icon-add">
+									<plus-icon />
+								</span>
 								<span class="add-card"> Add a card </span>
 							</button>
-							<div class="add-card-form">
-								<form>
+							<div v-else class="add-card-form">
+								<form @submit.prevent="submitCard(index)">
 									<div class="input-wrapper">
 										<textarea
 											placeholder="Enter a title for this card..."
 											cols="30"
 											rows="4"
+											:autofocus="column.isAddActive"
+											v-model="column.cardValue"
 										></textarea>
 									</div>
 									<div class="form-btn flex">
@@ -36,7 +44,10 @@
 											class="form-add-btn"
 											value="Add card"
 										/>
-										<button class="form-cancel-btn">
+										<button
+											@click.prevent="toggleCardForm(index)"
+											class="form-cancel-btn"
+										>
 											<close-icon></close-icon>
 										</button>
 									</div>
@@ -46,83 +57,119 @@
 					</div>
 				</div>
 			</template>
-			<add-board></add-board>
+			<add-board @submit-board="addColumn"></add-board>
 		</div>
 	</div>
+	<modal-dialog />
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
 import { randomId } from "./../helpers/various";
+
+import type { Columns, Cards } from "./../models/index.ts";
+
 import CloseIcon from "@/assets/svg/close.vue";
+import PlusIcon from "@/assets/svg/plus.vue";
 import AddBoard from "@/components/AddBoard.vue";
+import ModalDialog from "@/components/modal/generic.vue";
 
 const columns = ref([
 	{
 		id: randomId(),
 		title: "Goals",
+		isAddActive: false,
+		cardValue: "",
 		cards: [
 			{
 				id: randomId(),
 				title: "Road Map",
 				description: "first description",
-				isAdd: false,
 			},
 			{
 				id: randomId(),
 				title: "MVP for Apheleia SLP usage",
 				description: "first description",
-				isAdd: false,
 			},
 			{
 				id: randomId(),
 				title: "MVP for exernal Beta Testers",
 				description: "first description",
-				isAdd: false,
 			},
 		],
 	},
 	{
 		id: randomId(),
 		title: "Backlog",
+		isAddActive: false,
+		cardValue: "",
 		cards: [
 			{
 				id: randomId(),
 				title: "Add and edit resources",
 				description: "first description",
-				isAdd: false,
 			},
 			{
 				id: randomId(),
 				title: "Do more research about market competitors",
 				description: "first description",
-				isAdd: false,
 			},
 			{
 				id: randomId(),
 				title: "Search page & detailed card view page - implement figma design",
 				description: "first description",
-				isAdd: false,
 			},
 		],
 	},
 	{
 		id: randomId(),
 		title: "Sprint - Ready to implement",
+		isAddActive: false,
+		cardValue: "",
 		cards: [
 			{
 				id: randomId(),
 				title: "Install Google Analytics and TruConversion heat tracking",
 				description: "first description",
-				isAdd: false,
 			},
 		],
 	},
 	{
 		id: randomId(),
 		title: "In Progress",
+		isAddActive: false,
+		cardValue: "",
 		cards: [],
 	},
 ]);
+
+// METHODS
+const toggleCardForm = (index: number) => {
+	columns.value[index].isAddActive = !columns.value[index].isAddActive;
+};
+
+const submitCard = (index: number) => {
+	const col = columns.value[index] as Columns;
+	if (!col.cardValue.length) return;
+
+	const newCards = {
+		id: randomId(),
+		title: col.cardValue,
+	} as Cards;
+
+	columns.value[index].cards.push(newCards);
+	col.cardValue = "";
+};
+const addColumn = (title: string) => {
+	if (!title.length) return;
+	const col = {
+		id: randomId(),
+		title: title,
+		isAddActive: false,
+		cardValue: "",
+		cards: [],
+	};
+	columns.value.push(col);
+};
 </script>
 <style scoped lang="scss">
 .boards {
@@ -142,9 +189,11 @@ const columns = ref([
 				}
 			}
 			.list-card-footer {
-				@apply w-full p-1.5;
+				@apply w-full p-1.5 mt-1;
 				button.add-card {
 					@apply p-1.5 rounded-lg hover:bg-gray-300 w-full text-left;
+					display: flex;
+					align-items: center;
 					span.icon-add {
 						@apply mr-1.5 text-xl pl-1;
 					}

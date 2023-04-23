@@ -1,19 +1,24 @@
 <template>
 	<div class="add-board">
-		<div class="add-board__btn">
-			<button class="col-width">
+		<div v-if="!isAddBoard" class="add-board__btn">
+			<button class="col-width" @click="isAddBoard = true">
 				<plus-icon class="mr-1.5"></plus-icon>
 				Add another list
 			</button>
 		</div>
-		<div class="add-board__form col-width">
-			<form>
+		<div v-if="isAddBoard" class="add-board__form col-width">
+			<form @submit.prevent="submitBoard">
 				<div class="form-input">
-					<input type="text" placeholder="Enter list title.." />
+					<input
+						type="text"
+						v-model="boardTitle"
+						placeholder="Enter list title..."
+						autofocus
+					/>
 				</div>
 				<div class="form-btn flex">
 					<input type="submit" class="form-add-btn" value="Add list" />
-					<button class="form-cancel-btn">
+					<button @click.prevent="isAddBoard = false" class="form-cancel-btn">
 						<close-icon class="text-gray-600"></close-icon>
 					</button>
 				</div>
@@ -24,7 +29,22 @@
 <script setup lang="ts">
 import PlusIcon from "@/assets/svg/plus.vue";
 import CloseIcon from "@/assets/svg/close.vue";
+
+import { ref } from "vue";
+
+const emit = defineEmits(["submit-board"]);
+
+let isAddBoard = ref<Boolean>(false);
+let boardTitle = ref<String>("");
+
+// Methods
+const submitBoard = () => {
+	emit("submit-board", boardTitle.value);
+	boardTitle.value = "";
+	isAddBoard.value = false;
+};
 </script>
+
 <style scoped lang="scss">
 .add-board {
 	&__btn {
