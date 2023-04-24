@@ -58,9 +58,11 @@
 				</div>
 			</template>
 			<add-board @submit-board="addColumn"></add-board>
+			<!-- <router-view> -->
+			<!-- <update-card /> -->
+			<!-- </router-view> -->
 		</div>
 	</div>
-	<modal-dialog />
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
@@ -71,7 +73,7 @@ import type { Columns, Cards } from "./../models/index.ts";
 import CloseIcon from "@/assets/svg/close.vue";
 import PlusIcon from "@/assets/svg/plus.vue";
 import AddBoard from "@/components/AddBoard.vue";
-import ModalDialog from "@/components/modal/generic.vue";
+// import UpdateCard from "@/components/UpdateCard.vue";
 
 const columns = ref([
 	{
