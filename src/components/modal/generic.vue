@@ -9,19 +9,22 @@
 			class="bg-white rounded-lg shadow-lg px-8 py-6 z-50"
 		>
 			<slot name="title">
-				<h2 class="text-lg font-bold mb-4">Modal Title</h2>
+				<h2 class="text-lg font-bold mb-4">
+					Modal Title-{{ getVisible }}-{{ isVisible }}
+				</h2>
 			</slot>
 			<slot name="body">
 				<p class="mb-4">Modal content goes here.</p>
 			</slot>
 
 			<div class="flex justify-end">
-				<button
-					@click="isVisible = false"
+				<a
+					href="#"
+					@click.prevent="close"
 					class="bg-red-500 text-white px-4 py-2 rounded"
 				>
 					<slot name="cancel-title"> Cancel </slot>
-				</button>
+				</a>
 				<slot name="submit"> </slot>
 				<!-- <button class="bg-green-500 text-white px-4 py-2 rounded">Save</button> -->
 			</div>
@@ -34,14 +37,14 @@ export default {
 };
 </script>
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, toRef } from "vue";
+import { cardModalState } from "@/composables/updateModalState";
 
-let isVisible = ref(true);
+const { getVisible, close } = cardModalState();
+const isVisible = toRef(getVisible);
 
-// METHODS
-const open = () => {
-	isVisible.value = true;
-};
+// COMPUTED
+// const isVisible = computed(() => getVisible);
 </script>
 
 <style scoped lang="scss"></style>

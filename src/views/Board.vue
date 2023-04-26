@@ -10,7 +10,7 @@
 						<div class="list-card-body">
 							<template v-for="(card, ci) in column.cards" :key="ci">
 								<div class="list-cards">
-									<a href="#">
+									<a href="#" @click.prevent="updateCard(column.id, card.id)">
 										{{ card.title }}
 									</a>
 								</div>
@@ -58,14 +58,16 @@
 				</div>
 			</template>
 			<add-board @submit-board="addColumn"></add-board>
-			<!-- <router-view> -->
-			<!-- <update-card /> -->
-			<!-- </router-view> -->
 		</div>
 	</div>
+	<modal-dialog ref="cardDialog">
+		<template #body>
+			<router-view :key="route.path"></router-view>
+		</template>
+	</modal-dialog>
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { randomId } from "./../helpers/various";
 
 import type { Columns, Cards } from "./../models/index.ts";
@@ -73,8 +75,13 @@ import type { Columns, Cards } from "./../models/index.ts";
 import CloseIcon from "@/assets/svg/close.vue";
 import PlusIcon from "@/assets/svg/plus.vue";
 import AddBoard from "@/components/AddBoard.vue";
-// import UpdateCard from "@/components/UpdateCard.vue";
+import ModalDialog from "@/components/modal/generic.vue";
 
+import { useRoute, useRouter } from "vue-router";
+const router = useRouter();
+const route = useRoute();
+
+const cardDialog = ref<InstanceType<typeof ModalDialog> | null>(null);
 const columns = ref([
 	{
 		id: randomId(),
@@ -172,6 +179,20 @@ const addColumn = (title: string) => {
 	};
 	columns.value.push(col);
 };
+
+const updateCard = async (colId: string, cardId: string) => {
+	console.log(colId, cardId, "column and card Id");
+	// cardDialog.value?.open();
+	await router.push({ name: "UpdateCard", params: { cardId } });
+
+	console.log("mupalos ba ining open");
+};
+
+// MOUNTED
+onMounted(() => {
+	console.log("unday value");
+	// cardDialog.value?.close();
+});
 </script>
 <style scoped lang="scss">
 .boards {
