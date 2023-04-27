@@ -9,12 +9,9 @@
 <script setup lang="ts">
 // import ModalWrapper from "@/components/modal/generic.vue";
 import { onMounted } from "vue";
-import { cardModalState } from "@/composables/updateModalState";
+import cardModalState from "@/composables/updateModalState";
 
-const { open } = cardModalState();
+const { open, isVisible } = cardModalState();
 
-onMounted(() => {
-	// open();
-	console.log("inside out!!");
-});
+onMounted(() => {});
 </script>

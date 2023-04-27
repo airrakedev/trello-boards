@@ -20,7 +20,7 @@
 			<div class="flex justify-end">
 				<a
 					href="#"
-					@click.prevent="close"
+					@click.prevent="hideModal"
 					class="bg-red-500 text-white px-4 py-2 rounded"
 				>
 					<slot name="cancel-title"> Cancel </slot>
@@ -37,14 +37,22 @@ export default {
 };
 </script>
 <script setup lang="ts">
-import { computed, toRef } from "vue";
-import { cardModalState } from "@/composables/updateModalState";
+// import { computed, toRef } from "vue";
+import { useRouter } from "vue-router";
+import cardModalState from "@/composables/updateModalState";
 
-const { getVisible, close } = cardModalState();
-const isVisible = toRef(getVisible);
+const { isVisible, getVisible, close } = cardModalState();
+
+const router = useRouter();
 
 // COMPUTED
 // const isVisible = computed(() => getVisible);
+
+// METHODS
+const hideModal = async () => {
+	await router.push({ name: "Board" });
+	close();
+};
 </script>
 
 <style scoped lang="scss"></style>

@@ -12,11 +12,17 @@ const router = createRouter({
 			component: () => import("./../views/Board.vue"),
 			children: [
 				{
-					path: "card/:cardId",
+					path: "card/:columnId/:cardId",
 					name: "UpdateCard",
+					props: true,
 					component: () => import("@/components/UpdateCard.vue"),
 				},
 			],
+		},
+		{
+			path: "/:pathMatch(.*)*",
+			name: "Unknown",
+			component: () => import("@/views/Unknown.vue"),
 		},
 	],
 });

@@ -1,7 +1,8 @@
-import { ref, computed } from "vue";
+import { ref, readonly, computed } from "vue";
 
-export const cardModalState = () => {
-	const isVisible = ref(false);
+const isVisible = ref(false);
+
+export default () => {
 	const getVisible = computed(() => isVisible.value);
 	// METHODS
 	const open = () => {
@@ -9,10 +10,10 @@ export const cardModalState = () => {
 	};
 	const close = () => {
 		isVisible.value = false;
-		console.log(getVisible.value, "boom");
+		console.log(isVisible.value, "boom");
 	};
 	return {
-		isVisible,
+		isVisible: readonly(isVisible),
 		getVisible,
 		open,
 		close,

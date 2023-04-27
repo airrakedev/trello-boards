@@ -60,6 +60,7 @@
 			<add-board @submit-board="addColumn"></add-board>
 		</div>
 	</div>
+	<h1 class="text-8xl">{{ isVisible }}</h1>
 	<modal-dialog ref="cardDialog">
 		<template #body>
 			<router-view :key="route.path"></router-view>
@@ -67,7 +68,7 @@
 	</modal-dialog>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { randomId } from "./../helpers/various";
 
 import type { Columns, Cards } from "./../models/index.ts";
@@ -77,9 +78,13 @@ import PlusIcon from "@/assets/svg/plus.vue";
 import AddBoard from "@/components/AddBoard.vue";
 import ModalDialog from "@/components/modal/generic.vue";
 
+import modalState from "@/composables/updateModalState.ts";
+
 import { useRoute, useRouter } from "vue-router";
 const router = useRouter();
 const route = useRoute();
+
+const { isVisible, open } = modalState();
 
 const cardDialog = ref<InstanceType<typeof ModalDialog> | null>(null);
 const columns = ref([
@@ -180,18 +185,23 @@ const addColumn = (title: string) => {
 	columns.value.push(col);
 };
 
-const updateCard = async (colId: string, cardId: string) => {
-	console.log(colId, cardId, "column and card Id");
-	// cardDialog.value?.open();
-	await router.push({ name: "UpdateCard", params: { cardId } });
-
-	console.log("mupalos ba ining open");
+const updateCard = async (columnId: string, cardId: string) => {
+	await router.push({ name: "UpdateCard", params: { columnId, cardId } });
 };
 
+// WATCH
+watch(
+	() => route.name,
+	(nv) => {
+		if (nv === "UpdateCard") {
+			open();
+		}
+	},
+	{ deep: true, immediate: true }
+);
 // MOUNTED
 onMounted(() => {
-	console.log("unday value");
-	// cardDialog.value?.close();
+	// console.log(route.name, "unday value");
 });
 </script>
 <style scoped lang="scss">
