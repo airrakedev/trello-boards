@@ -1,0 +1,20 @@
+[
+	{
+		"id": "PLACEHOLDER_ID",
+		"title": "Goals",
+		"isAddActive": false,
+		"cardValue": "",
+		"cards": [
+			{
+				"id": "PLACEHOLDER_ID",
+				"title": "Road Map",
+				"description": "first description"
+			},
+			{
+				"id": "PLACEHOLDER_ID",
+				"title": "MVP for Apheleia SLP usage",
+				"description": "first description"
+			}
+		]
+	}
+]

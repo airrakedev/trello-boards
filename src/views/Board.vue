@@ -3,7 +3,7 @@
 		<div
 			class="extra-width h-screen px-6 bg-teal-500 overflow-x-auto mx-auto py-6 flex justify-start gap-6"
 		>
-			<template v-for="(column, index) in columns" :key="index">
+			<template v-for="(column, index) in getCards" :key="index">
 				<div class="list col-width">
 					<div class="main-card">
 						<div class="list-header">{{ column.title }}</div>
@@ -69,9 +69,6 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
-import { randomId } from "./../helpers/various";
-
-import type { Columns, Cards } from "./../models/index.ts";
 
 import CloseIcon from "@/assets/svg/close.vue";
 import PlusIcon from "@/assets/svg/plus.vue";
@@ -80,111 +77,20 @@ import ModalDialog from "@/components/modal/generic.vue";
 
 import modalState from "@/composables/updateModalState.ts";
 
+import { storeToRefs } from "pinia";
+import { useCardStore } from "@/stores/card";
 import { useRoute, useRouter } from "vue-router";
+
 const router = useRouter();
 const route = useRoute();
 
 const { isVisible, open } = modalState();
+const { getCards } = storeToRefs(useCardStore());
+const { toggleCardForm, submitCard, addColumn } = useCardStore();
 
 const cardDialog = ref<InstanceType<typeof ModalDialog> | null>(null);
-const columns = ref([
-	{
-		id: randomId(),
-		title: "Goals",
-		isAddActive: false,
-		cardValue: "",
-		cards: [
-			{
-				id: randomId(),
-				title: "Road Map",
-				description: "first description",
-			},
-			{
-				id: randomId(),
-				title: "MVP for Apheleia SLP usage",
-				description: "first description",
-			},
-			{
-				id: randomId(),
-				title: "MVP for exernal Beta Testers",
-				description: "first description",
-			},
-		],
-	},
-	{
-		id: randomId(),
-		title: "Backlog",
-		isAddActive: false,
-		cardValue: "",
-		cards: [
-			{
-				id: randomId(),
-				title: "Add and edit resources",
-				description: "first description",
-			},
-			{
-				id: randomId(),
-				title: "Do more research about market competitors",
-				description: "first description",
-			},
-			{
-				id: randomId(),
-				title: "Search page & detailed card view page - implement figma design",
-				description: "first description",
-			},
-		],
-	},
-	{
-		id: randomId(),
-		title: "Sprint - Ready to implement",
-		isAddActive: false,
-		cardValue: "",
-		cards: [
-			{
-				id: randomId(),
-				title: "Install Google Analytics and TruConversion heat tracking",
-				description: "first description",
-			},
-		],
-	},
-	{
-		id: randomId(),
-		title: "In Progress",
-		isAddActive: false,
-		cardValue: "",
-		cards: [],
-	},
-]);
 
 // METHODS
-const toggleCardForm = (index: number) => {
-	columns.value[index].isAddActive = !columns.value[index].isAddActive;
-};
-
-const submitCard = (index: number) => {
-	const col = columns.value[index] as Columns;
-	if (!col.cardValue.length) return;
-
-	const newCards = {
-		id: randomId(),
-		title: col.cardValue,
-	} as Cards;
-
-	columns.value[index].cards.push(newCards);
-	col.cardValue = "";
-};
-const addColumn = (title: string) => {
-	if (!title.length) return;
-	const col = {
-		id: randomId(),
-		title: title,
-		isAddActive: false,
-		cardValue: "",
-		cards: [],
-	};
-	columns.value.push(col);
-};
-
 const updateCard = async (columnId: string, cardId: string) => {
 	await router.push({ name: "UpdateCard", params: { columnId, cardId } });
 };
@@ -201,7 +107,7 @@ watch(
 );
 // MOUNTED
 onMounted(() => {
-	// console.log(route.name, "unday value");
+	console.log(getCards, "unday value");
 });
 </script>
 <style scoped lang="scss">

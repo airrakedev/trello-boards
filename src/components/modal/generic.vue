@@ -9,9 +9,7 @@
 			class="bg-white rounded-lg shadow-lg px-8 py-6 z-50"
 		>
 			<slot name="title">
-				<h2 class="text-lg font-bold mb-4">
-					Modal Title-{{ getVisible }}-{{ isVisible }}
-				</h2>
+				<h2 class="text-lg font-bold mb-4">Modal Title</h2>
 			</slot>
 			<slot name="body">
 				<p class="mb-4">Modal content goes here.</p>
@@ -41,7 +39,7 @@ export default {
 import { useRouter } from "vue-router";
 import cardModalState from "@/composables/updateModalState";
 
-const { isVisible, getVisible, close } = cardModalState();
+const { isVisible, close } = cardModalState();
 
 const router = useRouter();
 
