@@ -8,7 +8,7 @@ import { randomId } from "@/helpers/various";
 export const useCardStore = defineStore("card", () => {
 	// STATE
 	const cards = ref(useLocalStorage("cards", addCardId()));
-	const theCard = ref<Cards | null>(null);
+	const theCard = ref(null);
 
 	// GETTERS
 	const getCards = computed(() => cards.value);
