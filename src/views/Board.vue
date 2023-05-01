@@ -60,7 +60,7 @@
 			<add-board @submit-board="addColumn"></add-board>
 		</div>
 	</div>
-	<h1 class="text-8xl">{{ isVisible }}</h1>
+
 	<modal-dialog ref="cardDialog">
 		<template #body>
 			<router-view :key="route.path"></router-view>
