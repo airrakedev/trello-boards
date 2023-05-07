@@ -9,6 +9,7 @@ export const useCardStore = defineStore("card", () => {
 	// STATE
 	const cards = ref(useLocalStorage("cards", addCardId()));
 	const theCard = ref(null);
+	const theColumnId = ref(null);
 
 	// GETTERS
 	const getCards = computed(() => cards.value);
@@ -17,6 +18,17 @@ export const useCardStore = defineStore("card", () => {
 	// METHODS
 	const toggleCardForm = (index: number): void => {
 		cards.value[index].isAddActive = !cards.value[index].isAddActive;
+	};
+
+	const saveCurrentCard = (colId): void => {
+		const col = cards.value.find((v) => v.id === colId);
+		if (col) {
+			col.cards.forEach((v) => {
+				if (v.id === theCard.value.id) {
+					v.description = theCard.value.description;
+				}
+			});
+		}
 	};
 
 	const submitCard = (index: number): void => {
@@ -48,11 +60,14 @@ export const useCardStore = defineStore("card", () => {
 		const result = cards.value
 			.find((c) => c.id === colId)
 			?.cards.find((card) => card.id === cardId);
-		console.log(result, "hahaha");
-		if (!result) {
-			return false;
-		}
-		theCard.value = result;
+		return new Promise((resolve) => {
+			if (!result) {
+				return resolve(false);
+			}
+			theCard.value = result;
+			theColumnId.value = colId;
+			return resolve(true);
+		});
 	};
 
 	return {
@@ -61,8 +76,10 @@ export const useCardStore = defineStore("card", () => {
 		theCard,
 		getThecard,
 		toggleCardForm,
+		saveCurrentCard,
 		submitCard,
 		addColumn,
 		fetchCard,
+		theColumnId,
 	};
 });

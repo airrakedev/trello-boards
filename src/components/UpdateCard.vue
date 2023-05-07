@@ -22,6 +22,7 @@
 							<description-icon class="text-gray-600 mr-3"></description-icon>
 							<div class="text-lg font-medium">Description</div>
 						</div>
+
 						<div class="w-full pl-9">
 							<div
 								class="dummy-textarea rounded bg-gray-100 p-3 pb-8 hover:bg-gray-200 cursor-pointer"
@@ -30,13 +31,23 @@
 							>
 								Add a more detailed description...
 							</div>
+
 							<div v-else class="flex flex-col justify-start">
-								<QuillEditor :options="options" />
+								<QuillEditor
+									v-model:content="theDescription"
+									contentType="html"
+									placeholder="Add a more detailed description..."
+									:options="options"
+									class="the-editor"
+								/>
 								<div class="mt-2">
 									<button
 										class="rounded bg-blue-500 text-white px-4 py-2 text-sm"
+										@click="saveDescription"
+										:disabled="isLoading"
+										:class="{ 'bg-blue-200': isLoading }"
 									>
-										Save
+										{{ isLoading ? "Wait" : "Save" }}
 									</button>
 									<button
 										class="rounded px-3 py-2 text-sm hover:bg-gray-200 ml-1"
@@ -62,7 +73,7 @@ import DescriptionIcon from "@/assets/svg/description.vue";
 import { QuillEditor } from "@vueup/vue-quill";
 import "@vueup/vue-quill/dist/vue-quill.snow.css";
 
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, watch, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import cardModalState from "@/composables/updateModalState";
 
@@ -71,8 +82,9 @@ const { close } = cardModalState();
 import { storeToRefs } from "pinia";
 import { useCardStore } from "@/stores/card";
 
-const { getTheCard, theCard } = storeToRefs(useCardStore());
-const { fetchCard } = useCardStore();
+const store = useCardStore();
+const { getTheCard, theCard, theColumnId } = storeToRefs(useCardStore());
+const { fetchCard, saveCurrentCard } = useCardStore();
 
 const router = useRouter();
 
@@ -105,8 +117,19 @@ const options = ref({
 });
 
 const isDescription = ref(false);
+const theDescription = ref("");
+const isLoading = ref(false);
 
 // COMPUTED
+
+// WATCH
+// watch(
+// 	() => theCard,
+// 	(v) => {
+// 		console.log(v.value, "ist watcher");
+// 	},
+// 	{ immediate: true }
+// );
 
 // METHODS
 const hideModal = async () => {
@@ -114,23 +137,43 @@ const hideModal = async () => {
 	close();
 };
 
-onMounted(() => {
-	console.log(props.columnId, props.cardId, "ubnsa god ni");
-	fetchCard(props.columnId, props.cardId);
-	console.log(getTheCard, "The cards selected");
+const saveDescription = (): void => {
+	if (store.theCard.description === theDescription.value) return;
+
+	isLoading.value = true;
+	store.$patch(({ theCard }) => (theCard.description = theDescription.value));
+	saveCurrentCard(props.columnId);
+
+	setTimeout(() => {
+		isLoading.value = false;
+	}, 750);
+};
+
+onMounted(async () => {
+	const fetch = await fetchCard(props.columnId, props.cardId);
+	if (theCard.value?.description && theCard.value.description.length) {
+		theDescription.value = theCard.value.description;
+	}
+
+	if (!fetch) {
+		await hideModal();
+	}
 });
 </script>
 
 <style lang="scss">
 .ql-toolbar {
 	font-family: inherit;
+	@apply bg-white;
 }
 .ql-container {
+	@apply bg-white;
 	.ql-editor {
 		padding-top: 20px;
 		padding-bottom: 20px;
 		font-size: 14px;
 		font-family: inherit;
+		min-height: 200px;
 		&:before {
 			font-style: inherit;
 		}

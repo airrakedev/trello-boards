@@ -4,7 +4,7 @@
 		class="fixed inset-0 z-30 flex items-center justify-center"
 	>
 		<div class="fixed inset-0 bg-gray-800 opacity-50 z-40"></div>
-		<div v-bind="$attrs" class="bg-white rounded-lg shadow-lg px-6 py-6 z-50">
+		<div v-bind="$attrs" class="bg-gray-50 rounded-lg shadow-lg px-6 py-6 z-50">
 			<slot name="title">
 				<h2 class="text-lg font-bold mb-4">Modal Title</h2>
 			</slot>

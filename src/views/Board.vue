@@ -84,7 +84,7 @@ import { useRoute, useRouter } from "vue-router";
 const router = useRouter();
 const route = useRoute();
 
-const { isVisible, open } = modalState();
+const { isVisible, open, close } = modalState();
 const { getCards } = storeToRefs(useCardStore());
 const { toggleCardForm, submitCard, addColumn } = useCardStore();
 
@@ -99,15 +99,20 @@ const updateCard = async (columnId: string, cardId: string) => {
 watch(
 	() => route.name,
 	(nv) => {
+		console.log(nv, isVisible.value, "not value");
 		if (nv === "UpdateCard") {
 			open();
+		}
+
+		if (nv === "Board" && isVisible.value) {
+			close();
 		}
 	},
 	{ deep: true, immediate: true }
 );
 // MOUNTED
 onMounted(() => {
-	console.log(getCards, "unday value");
+	// console.log(isVisible.value, "modal State");
 });
 </script>
 <style scoped lang="scss">
