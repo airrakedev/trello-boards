@@ -1,7 +1,7 @@
 <template>
 	<div class="add-board">
 		<div v-if="!isAddBoard" class="add-board__btn">
-			<button class="col-width" @click="isAddBoard = true">
+			<button class="col-width" @click="toggleBoard">
 				<plus-icon class="mr-1.5"></plus-icon>
 				Add another list
 			</button>
@@ -13,12 +13,12 @@
 						type="text"
 						v-model="boardTitle"
 						placeholder="Enter list title..."
-						autofocus
+						ref="boardInput"
 					/>
 				</div>
 				<div class="form-btn flex">
 					<input type="submit" class="form-add-btn" value="Add list" />
-					<button @click.prevent="isAddBoard = false" class="form-cancel-btn">
+					<button @click.prevent="toggleBoard" class="form-cancel-btn">
 						<close-icon class="text-gray-600"></close-icon>
 					</button>
 				</div>
@@ -30,18 +30,28 @@
 import PlusIcon from "@/assets/svg/plus.vue";
 import CloseIcon from "@/assets/svg/close.vue";
 
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 
 const emit = defineEmits(["submit-board"]);
 
 let isAddBoard = ref<Boolean>(false);
 let boardTitle = ref<String>("");
 
+let boardInput = ref<HTMLInputElement>();
+
 // Methods
 const submitBoard = () => {
 	emit("submit-board", boardTitle.value);
 	boardTitle.value = "";
 	isAddBoard.value = false;
+};
+
+const toggleBoard = async () => {
+	isAddBoard.value = !isAddBoard.value;
+	await nextTick();
+	if (isAddBoard.value) {
+		boardInput.value?.focus();
+	}
 };
 </script>
 

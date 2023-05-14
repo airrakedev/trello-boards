@@ -17,6 +17,11 @@ export const useCardStore = defineStore("card", () => {
 
 	// METHODS
 	const toggleCardForm = (index: number): void => {
+		cards.value.forEach((v, i) => {
+			if (i != index && v.isAddActive) {
+				v.isAddActive = false;
+			}
+		});
 		cards.value[index].isAddActive = !cards.value[index].isAddActive;
 	};
 
@@ -70,6 +75,11 @@ export const useCardStore = defineStore("card", () => {
 		});
 	};
 
+	const moveColumn = ({ newIndex, oldIndex, element }) => {
+		cards.value.splice(oldIndex, 1); //remove selected cards
+		cards.value.splice(newIndex, 0, element); //splice selected cards
+	};
+
 	return {
 		cards,
 		getCards,
@@ -80,6 +90,7 @@ export const useCardStore = defineStore("card", () => {
 		submitCard,
 		addColumn,
 		fetchCard,
+		moveColumn,
 		theColumnId,
 	};
 });

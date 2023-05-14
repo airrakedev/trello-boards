@@ -1,63 +1,80 @@
 <template>
 	<div class="boards">
-		<div
-			class="extra-width h-screen px-6 bg-teal-500 overflow-x-auto mx-auto py-6 flex justify-start gap-6"
-		>
-			<template v-for="(column, index) in getCards" :key="index">
-				<div class="list col-width">
-					<div class="main-card">
-						<div class="list-header">{{ column.title }}</div>
-						<div class="list-card-body">
-							<template v-for="(card, ci) in column.cards" :key="ci">
-								<div class="list-cards">
-									<a href="#" @click.prevent="updateCard(column.id, card.id)">
-										{{ card.title }}
-									</a>
+		<div class="extra-width h-screen flex pr-6 bg-teal-500">
+			<!-- <template v-for="(column, index) in getCards" :key="index"> -->
+			<draggable
+				v-model="getCards"
+				item-key="index"
+				class="w-full px-6 overflow-x-auto mx-auto py-6 flex justify-start gap-6"
+				@change.self="columnChange"
+			>
+				<template #item="{ element, index }">
+					<div class="list col-width">
+						<div class="main-card">
+							<div class="list-header">{{ element.title }}</div>
+							<div class="list-card-body bg-teal-100">
+								<!-- <template v-for="(card, ci) in element.cards" :key="ci"> -->
+								<draggable v-model="element.cards" item-key="id" group="a">
+									<template #item="card">
+										<div class="list-cards">
+											<a
+												href="#"
+												@click.prevent="updateCard(element.id, card.element.id)"
+											>
+												{{ card.element.title }}
+											</a>
+										</div>
+									</template>
+								</draggable>
+								<!-- </template> -->
+							</div>
+							<div class="list-card-footer">
+								<button
+									v-if="!element.isAddActive"
+									class="add-card"
+									@click.prevent="toggleAddCard(index)"
+								>
+									<span class="icon-add">
+										<plus-icon />
+									</span>
+									<span class="add-card"> Add a card </span>
+								</button>
+								<div v-else class="add-card-form">
+									<form @submit.prevent="submitCardInput(index)">
+										<div class="input-wrapper">
+											<textarea
+												placeholder="Enter a title for this card..."
+												cols="30"
+												rows="4"
+												ref="textInput"
+												v-model="element.cardValue"
+											></textarea>
+										</div>
+										<div class="form-btn flex">
+											<input
+												type="submit"
+												class="form-add-btn"
+												value="Add card"
+											/>
+											<button
+												@click.prevent="toggleAddCard(index)"
+												class="form-cancel-btn"
+											>
+												<close-icon></close-icon>
+											</button>
+										</div>
+									</form>
 								</div>
-							</template>
-						</div>
-						<div class="list-card-footer">
-							<button
-								v-if="!column.isAddActive"
-								class="add-card"
-								@click.prevent="toggleCardForm(index)"
-							>
-								<span class="icon-add">
-									<plus-icon />
-								</span>
-								<span class="add-card"> Add a card </span>
-							</button>
-							<div v-else class="add-card-form">
-								<form @submit.prevent="submitCard(index)">
-									<div class="input-wrapper">
-										<textarea
-											placeholder="Enter a title for this card..."
-											cols="30"
-											rows="4"
-											:autofocus="column.isAddActive"
-											v-model="column.cardValue"
-										></textarea>
-									</div>
-									<div class="form-btn flex">
-										<input
-											type="submit"
-											class="form-add-btn"
-											value="Add card"
-										/>
-										<button
-											@click.prevent="toggleCardForm(index)"
-											class="form-cancel-btn"
-										>
-											<close-icon></close-icon>
-										</button>
-									</div>
-								</form>
 							</div>
 						</div>
 					</div>
-				</div>
-			</template>
-			<add-board @submit-board="addColumn"></add-board>
+				</template>
+
+				<template #footer>
+					<add-board @submit-board="addColumn"></add-board>
+				</template>
+			</draggable>
+			<!-- </template> -->
 		</div>
 	</div>
 
@@ -68,7 +85,9 @@
 	</modal-dialog>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, nextTick } from "vue";
+
+import draggable from "vuedraggable";
 
 import CloseIcon from "@/assets/svg/close.vue";
 import PlusIcon from "@/assets/svg/plus.vue";
@@ -86,20 +105,37 @@ const route = useRoute();
 
 const { isVisible, open, close } = modalState();
 const { getCards } = storeToRefs(useCardStore());
-const { toggleCardForm, submitCard, addColumn } = useCardStore();
+const { toggleCardForm, submitCard, addColumn, moveColumn } = useCardStore();
 
 const cardDialog = ref<InstanceType<typeof ModalDialog> | null>(null);
+const textInput = ref<HTMLTextAreaElement>();
 
 // METHODS
 const updateCard = async (columnId: string, cardId: string) => {
 	await router.push({ name: "UpdateCard", params: { columnId, cardId } });
 };
 
+const columnChange = ({ moved }) => {
+	console.log(moved, "column event");
+	moveColumn(moved);
+};
+
+const toggleAddCard = async (index: string) => {
+	toggleCardForm(index);
+	await nextTick();
+	textInput.value?.focus();
+};
+
+const submitCardInput = async (i) => {
+	submitCard(i);
+	await nextTick();
+	textInput.value?.focus();
+};
+
 // WATCH
 watch(
 	() => route.name,
 	(nv) => {
-		console.log(nv, isVisible.value, "not value");
 		if (nv === "UpdateCard") {
 			open();
 		}
@@ -124,7 +160,7 @@ onMounted(() => {
 				@apply py-2.5 px-2 relative font-semibold;
 			}
 			.list-card-body {
-				@apply mx-1 px-1;
+				@apply mx-1 px-1 pt-1 pb-1;
 				.list-cards {
 					@apply rounded-md mb-2 relative bg-white shadow py-2 px-2.5;
 				}
@@ -133,7 +169,7 @@ onMounted(() => {
 				}
 			}
 			.list-card-footer {
-				@apply w-full p-1.5 mt-1;
+				@apply w-full p-1.5;
 				button.add-card {
 					@apply p-1.5 rounded-lg hover:bg-gray-300 w-full text-left;
 					display: flex;
