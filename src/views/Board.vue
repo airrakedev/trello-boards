@@ -11,18 +11,32 @@
 				<template #item="{ element, index }">
 					<div class="list col-width">
 						<div class="main-card">
-							<div class="list-header">{{ element.title }}</div>
-							<div class="list-card-body bg-teal-100">
+							<div class="list-header flex justify-between items-center">
+								{{ element.title }}
+								<button>
+									<circle-close-icon
+										class="text-gray-300 hover:text-gray-400"
+									/>
+								</button>
+							</div>
+							<div class="list-card-body">
 								<!-- <template v-for="(card, ci) in element.cards" :key="ci"> -->
 								<draggable v-model="element.cards" item-key="id" group="a">
 									<template #item="card">
-										<div class="list-cards">
+										<div
+											class="list-cards flex justify-between items-center group"
+										>
 											<a
 												href="#"
 												@click.prevent="updateCard(element.id, card.element.id)"
 											>
 												{{ card.element.title }}
 											</a>
+											<button>
+												<close-icon
+													class="hidden group-hover:block w-4 h-4 text-gray-300 hover:text-gray-400"
+												/>
+											</button>
 										</div>
 									</template>
 								</draggable>
@@ -39,32 +53,14 @@
 									</span>
 									<span class="add-card"> Add a card </span>
 								</button>
-								<div v-else class="add-card-form">
-									<form @submit.prevent="submitCardInput(index)">
-										<div class="input-wrapper">
-											<textarea
-												placeholder="Enter a title for this card..."
-												cols="30"
-												rows="4"
-												ref="textInput"
-												v-model="element.cardValue"
-											></textarea>
-										</div>
-										<div class="form-btn flex">
-											<input
-												type="submit"
-												class="form-add-btn"
-												value="Add card"
-											/>
-											<button
-												@click.prevent="toggleAddCard(index)"
-												class="form-cancel-btn"
-											>
-												<close-icon></close-icon>
-											</button>
-										</div>
-									</form>
-								</div>
+								<!-- Adding Card deck -->
+								<template v-else>
+									<add-card-form
+										@submit="submitCardInput(index)"
+										@toggleCard="toggleAddCard(index)"
+										v-model="element.cardValue"
+									></add-card-form>
+								</template>
 							</div>
 						</div>
 					</div>
@@ -85,14 +81,17 @@
 	</modal-dialog>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick } from "vue";
+import { ref, onMounted, watch } from "vue";
 
 import draggable from "vuedraggable";
 
-import CloseIcon from "@/assets/svg/close.vue";
 import PlusIcon from "@/assets/svg/plus.vue";
+import CircleCloseIcon from "@/assets/svg/circleClose.vue";
+import CloseIcon from "@/assets/svg/close.vue";
+
 import AddBoard from "@/components/AddBoard.vue";
 import ModalDialog from "@/components/modal/generic.vue";
+import AddCardForm from "@/components/forms/AddCardForm.vue";
 
 import modalState from "@/composables/updateModalState.ts";
 
@@ -108,7 +107,6 @@ const { getCards } = storeToRefs(useCardStore());
 const { toggleCardForm, submitCard, addColumn, moveColumn } = useCardStore();
 
 const cardDialog = ref<InstanceType<typeof ModalDialog> | null>(null);
-const textInput = ref<HTMLTextAreaElement>();
 
 // METHODS
 const updateCard = async (columnId: string, cardId: string) => {
@@ -121,15 +119,12 @@ const columnChange = ({ moved }) => {
 };
 
 const toggleAddCard = async (index: string) => {
+	console.log(index, "unsay index diay");
 	toggleCardForm(index);
-	await nextTick();
-	textInput.value?.focus();
 };
 
 const submitCardInput = async (i) => {
 	submitCard(i);
-	await nextTick();
-	textInput.value?.focus();
 };
 
 // WATCH
@@ -176,24 +171,6 @@ onMounted(() => {
 					align-items: center;
 					span.icon-add {
 						@apply mr-1.5 text-xl pl-1;
-					}
-				}
-				.add-card-form {
-					@apply px-0.5;
-					.input-wrapper {
-						@apply shadow rounded-md bg-white px-2 pt-2 pb-0.5;
-						textarea {
-							@apply outline-none w-full;
-						}
-					}
-					.form-btn {
-						@apply mt-2;
-						.form-add-btn {
-							@apply rounded cursor-pointer px-3 py-1.5 bg-blue-600 text-white mr-1 hover:bg-blue-700;
-						}
-						.form-cancel-btn {
-							@apply px-1 py-1.5;
-						}
 					}
 				}
 			}

@@ -38,6 +38,7 @@ export const useCardStore = defineStore("card", () => {
 
 	const submitCard = (index: number): void => {
 		const col = cards.value[index] as Columns;
+
 		if (!col.cardValue.length) return;
 
 		const newCards = {
